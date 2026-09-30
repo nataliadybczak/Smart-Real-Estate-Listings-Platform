@@ -47,6 +47,15 @@
       {{ listing.ai_summary or (listing.description|truncate(170, true, '…')) }}
     </p>
 
+    {% if listing.balcony == 'yes' or listing.elevator == 'yes' or listing.parking in ['included', 'extra_cost'] or listing.furnished in ['yes', 'partly'] %}
+      <ul class="tags">
+        {% if listing.balcony == 'yes' %}<li>🌿 balcony</li>{% endif %}
+        {% if listing.elevator == 'yes' %}<li>🛗 elevator</li>{% endif %}
+        {% if listing.parking == 'included' %}<li>🚗 parking</li>{% elif listing.parking == 'extra_cost' %}<li>🚗 parking (extra)</li>{% endif %}
+        {% if listing.furnished in ['yes', 'partly'] %}<li>🛋 {{ 'furnished' if listing.furnished == 'yes' else 'partly furnished' }}</li>{% endif %}
+      </ul>
+    {% endif %}
+
     <div class="badges">
       {% if listing.market %}<span class="badge">{{ listing.market|label }}</span>{% endif %}
       {% if listing.seller_type %}<span class="badge badge--muted">{{ listing.seller_type|label }}</span>{% endif %}

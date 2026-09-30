@@ -63,6 +63,17 @@ def apply_filters(stmt: Select, filters: ListingFilters) -> Select:
         stmt = stmt.where(Listing.market == filters.market)
     if filters.no_ground_floor:
         stmt = stmt.where(Listing.floor > 0)
+    # AI-extracted fields: only an explicit "yes" from the description counts.
+    feature_conditions = {
+        "balcony": Listing.balcony == "yes",
+        "elevator": Listing.elevator == "yes",
+        "parking": Listing.parking.in_(["included", "extra_cost"]),
+        "furnished": Listing.furnished.in_(["yes", "partly"]),
+    }
+    for feature in filters.features:
+        stmt = stmt.where(feature_conditions[feature])
+    if filters.condition:
+        stmt = stmt.where(Listing.condition == filters.condition)
     return stmt
 
 

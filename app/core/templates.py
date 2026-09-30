@@ -18,6 +18,12 @@ LABELS = {
     "renovated": "renovated",
     "to_refresh": "needs refreshing",
     "to_renovate": "needs renovation",
+    "included": "included in price",
+    "extra_cost": "available at extra cost",
+    "shared": "shared / street parking",
+    "yes": "yes",
+    "no": "no",
+    "partly": "partly",
 }
 
 FLAG_LABELS = {

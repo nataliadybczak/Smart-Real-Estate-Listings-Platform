@@ -68,6 +68,11 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1p
 .contact-note { margin: 12px 0 0; font-size: 0.85rem; color: var(--muted); line-height: 1.45; }
 .link { color: var(--accent); font-weight: 500; }
 
+.ai-mark { display: inline-block; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; padding: 1px 6px; border-radius: 4px; background: #efe9ff; color: #5b3fc4; vertical-align: middle; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; padding: 0; list-style: none; font-size: 0.85rem; color: var(--text); }
+.ai-heading { font-size: 0.95rem; margin: 4px 0 0; display: flex; align-items: center; gap: 6px; }
+.params--ai { margin-top: 10px; }
+
 /* ---------- Results ---------- */
 .results__header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
 .results__count { margin: 0; }
@@ -177,3 +182,4 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1p
   .card__media { aspect-ratio: 16 / 10; }
   .topbar__note { display: none; }
 }
+.params--ai + .contact-note { margin-bottom: 16px; }

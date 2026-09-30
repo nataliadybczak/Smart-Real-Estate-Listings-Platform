@@ -57,7 +57,7 @@
 
     {% if listing.ai_summary %}
       <section class="section">
-        <h2>Summary</h2>
+        <h2>Summary <span class="ai-mark">AI</span></h2>
         <p>{{ listing.ai_summary }}</p>
       </section>
     {% endif %}
@@ -81,13 +81,27 @@
         <dt>Year built</dt><dd>{{ listing.build_year or '–' }}</dd>
         {% if listing.building_type %}<dt>Building type</dt><dd>{{ listing.building_type|source_value }}</dd>{% endif %}
         {% if listing.ownership %}<dt>Ownership</dt><dd>{{ listing.ownership|source_value }}</dd>{% endif %}
-        {% if listing.condition and listing.condition != 'unknown' %}<dt>Condition</dt><dd>{{ listing.condition|label }}</dd>{% endif %}
-        {% if listing.monthly_fee_pln %}<dt>Monthly fee</dt><dd>{{ listing.monthly_fee_pln|number }} PLN</dd>{% endif %}
         {% for name, value in listing.extra_attributes.items() %}<dt>{{ name|attr_name }}</dt><dd>{{ value|source_value }}</dd>{% endfor %}
       </dl>
 
+      {% set ai_facts = [
+        ('Condition', listing.condition), ('Balcony / terrace', listing.balcony), ('Elevator', listing.elevator),
+        ('Parking', listing.parking), ('Furnished', listing.furnished)] %}
+      {% if listing.ai_enriched_at %}
+        <h3 class="ai-heading">From the description <span class="ai-mark">AI</span></h3>
+        <dl class="params params--ai">
+          {% for name, value in ai_facts if value and value != 'unknown' %}
+            <dt>{{ name }}</dt><dd>{{ value|label }}</dd>
+          {% endfor %}
+          {% if listing.monthly_fee_pln %}<dt>Monthly fee</dt><dd>{{ listing.monthly_fee_pln|number }} PLN</dd>{% endif %}
+        </dl>
+        <p class="contact-note">Extracted automatically from the seller's description – may contain mistakes.</p>
+      {% endif %}
+
       {% if listing.url %}
         <a class="button button--block button--large" href="{{ listing.url }}" target="_blank" rel="noopener">✉ Contact the seller</a>
+        <p class="contact-note">Listed by: <strong>{{ listing.seller_type|label }}</strong><br>
+          Contact details are shown on the original listing at Sprzedajemy.pl. We don't store sellers' personal data.</p>
       {% endif %}
     </div>
   </aside>

@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     database_url: str = "mysql+pymysql://app:app@127.0.0.1:3306/real_estate?charset=utf8mb4"
     database_ssl_ca: str | None = None
 
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini-flash-latest"
+
 
 @lru_cache
 def get_settings() -> Settings:

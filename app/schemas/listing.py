@@ -3,7 +3,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -14,6 +14,10 @@ class SortOption(StrEnum):
     PRICE_DESC = "price_desc"
     PRICE_PER_M2_ASC = "ppm_asc"
     AREA_DESC = "area_desc"
+
+
+Feature = Literal["balcony", "elevator", "parking", "furnished"]
+Condition = Literal["developer", "ready", "renovated", "to_refresh", "to_renovate"]
 
 
 class ListingFilters(BaseModel):
@@ -30,6 +34,8 @@ class ListingFilters(BaseModel):
     rooms: list[int] = Field(default_factory=list, description="4 means 4 or more")
     market: str | None = Field(None, pattern="^(primary|secondary)$")
     no_ground_floor: bool = False
+    features: list[Feature] = Field(default_factory=list, description="Extracted by AI")
+    condition: Condition | None = Field(None, description="Extracted by AI")
     sort: SortOption = SortOption.NEWEST
     page: int = Field(1, ge=1)
 

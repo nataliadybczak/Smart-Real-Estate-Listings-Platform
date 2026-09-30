@@ -62,6 +62,28 @@
         </div>
       </fieldset>
 
+      <fieldset class="field">
+        <legend>Features <span class="ai-mark" title="Extracted from listing descriptions by AI">AI</span></legend>
+        <div class="pills">
+          {% for value, text in [('balcony', 'Balcony'), ('elevator', 'Elevator'), ('parking', 'Parking'), ('furnished', 'Furnished')] %}
+            <label class="pill">
+              <input type="checkbox" name="features" value="{{ value }}" data-autosubmit {% if value in filters.features %}checked{% endif %}>
+              <span>{{ text }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <label class="field">
+        <span>Condition <span class="ai-mark" title="Extracted from listing descriptions by AI">AI</span></span>
+        <select name="condition" data-autosubmit>
+          <option value="">Any</option>
+          {% for value in ['developer', 'ready', 'renovated', 'to_refresh', 'to_renovate'] %}
+            <option value="{{ value }}" {% if filters.condition == value %}selected{% endif %}>{{ value|label|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
       <label class="checkbox">
         <input type="checkbox" name="no_ground_floor" value="true" data-autosubmit {% if filters.no_ground_floor %}checked{% endif %}>
         <span>No ground floor</span>
