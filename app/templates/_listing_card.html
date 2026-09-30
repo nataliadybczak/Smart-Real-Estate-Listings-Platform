@@ -1,0 +1,58 @@
+{% macro listing_card(listing) %}
+<article class="card">
+  <div class="card__media carousel" data-carousel>
+    {% if listing.images %}
+      <div class="carousel__track">
+        {% for image in listing.images %}
+          <a class="carousel__slide" href="/listings/{{ listing.id }}" tabindex="-1">
+            <img src="{{ image.url }}" alt="{% if loop.first %}{{ listing.title }}{% endif %}"
+                 {% if not loop.first %}loading="lazy"{% endif %} referrerpolicy="no-referrer"
+                 onerror="this.style.visibility='hidden'">
+          </a>
+        {% endfor %}
+      </div>
+      {% if listing.images|length > 1 %}
+        <button type="button" class="carousel__nav carousel__nav--prev" data-step="-1" aria-label="Previous photo">‹</button>
+        <button type="button" class="carousel__nav carousel__nav--next" data-step="1" aria-label="Next photo">›</button>
+        <span class="carousel__counter">1 / {{ listing.images|length }}</span>
+      {% endif %}
+    {% else %}
+      <div class="card__no-image">no photo</div>
+    {% endif %}
+  </div>
+
+  <a class="card__body" href="/listings/{{ listing.id }}">
+    <div class="card__price-row">
+      <strong class="card__price">{{ listing.price_pln|number }} PLN</strong>
+      <span class="card__ppm">{{ listing.price_per_m2|number }} PLN/m²</span>
+    </div>
+
+    <h2 class="card__title">{{ listing.title }}</h2>
+
+    <ul class="facts">
+      <li>{{ listing.area_m2|area }}</li>
+      <li>{{ listing.rooms|rooms }}</li>
+      <li>{{ listing.floor|floor }}</li>
+      {% if listing.build_year %}<li>built {{ listing.build_year }}</li>{% endif %}
+    </ul>
+
+    <p class="card__location">
+      📍 {{ listing.city }}{% if listing.district %}, {{ listing.district }}{% endif %}
+      {% if listing.location_raw and listing.location_raw != listing.district %}
+        <span class="muted">· {{ listing.location_raw }}</span>
+      {% endif %}
+    </p>
+
+    <p class="card__summary">
+      {{ listing.ai_summary or (listing.description|truncate(170, true, '…')) }}
+    </p>
+
+    <div class="badges">
+      {% if listing.market %}<span class="badge">{{ listing.market|label }}</span>{% endif %}
+      {% if listing.seller_type %}<span class="badge badge--muted">{{ listing.seller_type|label }}</span>{% endif %}
+      {% if listing.condition and listing.condition != 'unknown' %}<span class="badge badge--accent">{{ listing.condition|label }}</span>{% endif %}
+      {% if listing.flags %}<span class="badge badge--warning" title="{% for f in listing.flags %}{{ f|flag }}{% if not loop.last %}; {% endif %}{% endfor %}">⚠ needs verification</span>{% endif %}
+    </div>
+  </a>
+</article>
+{% endmacro %}

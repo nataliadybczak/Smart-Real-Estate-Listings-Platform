@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% from "_listing_card.html" import listing_card %}
+
+{% block content %}
+<div class="layout">
+  <aside class="sidebar">
+    <form class="filters" method="get" action="/" id="filters">
+      <h2 class="filters__title">Filters</h2>
+
+      <label class="field">
+        <span>Search listings</span>
+        <input type="search" name="q" value="{{ filters.q or '' }}" placeholder="e.g. balkon, Kazimierz">
+      </label>
+
+      <label class="field">
+        <span>District</span>
+        <select name="district" data-autosubmit>
+          <option value="">All</option>
+          {% for name, count in districts %}
+            <option value="{{ name }}" {% if filters.district == name %}selected{% endif %}>{{ name }} ({{ count }})</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <fieldset class="field">
+        <legend>Price (PLN)</legend>
+        <div class="range">
+          <input type="number" name="price_min" min="0" step="10000" placeholder="min" value="{{ filters.price_min or '' }}">
+          <input type="number" name="price_max" min="0" step="10000" placeholder="max" value="{{ filters.price_max or '' }}">
+        </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Area (m²)</legend>
+        <div class="range">
+          <input type="number" name="area_min" min="0" step="1" placeholder="min" value="{{ filters.area_min|int if filters.area_min is not none else '' }}">
+          <input type="number" name="area_max" min="0" step="1" placeholder="max" value="{{ filters.area_max|int if filters.area_max is not none else '' }}">
+        </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Rooms</legend>
+        <div class="pills">
+          {% for value, text in [(1, '1'), (2, '2'), (3, '3'), (4, '4+')] %}
+            <label class="pill">
+              <input type="checkbox" name="rooms" value="{{ value }}" data-autosubmit {% if value in filters.rooms %}checked{% endif %}>
+              <span>{{ text }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Market</legend>
+        <div class="pills">
+          {% for value, text in [('', 'All'), ('primary', 'Primary'), ('secondary', 'Secondary')] %}
+            <label class="pill">
+              <input type="radio" name="market" value="{{ value }}" data-autosubmit {% if (filters.market or '') == value %}checked{% endif %}>
+              <span>{{ text }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <label class="checkbox">
+        <input type="checkbox" name="no_ground_floor" value="true" data-autosubmit {% if filters.no_ground_floor %}checked{% endif %}>
+        <span>No ground floor</span>
+      </label>
+
+
+      <div class="filters__actions">
+        <button type="submit" class="button">Show results</button>
+        {% if filters.is_active() %}<a class="link" href="/">Clear filters</a>{% endif %}
+      </div>
+    </form>
+  </aside>
+
+  <section class="results">
+    <div class="results__header">
+      <p class="results__count"><strong>{{ result.total|listings }}</strong>{% if filters.is_active() %} match your filters{% endif %}</p>
+      <label class="sort">
+        <span>Sort by:</span>
+        <select name="sort" form="filters" data-autosubmit>
+          {% for option, text in sort_labels.items() %}
+            <option value="{{ option.value }}" {% if filters.sort == option %}selected{% endif %}>{{ text }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    {% for listing in result.items %}
+      {{ listing_card(listing) }}
+    {% else %}
+      <div class="empty">
+        <p><strong>No listings match your filters.</strong></p>
+        <p>Try widening the price or area range. <a class="link" href="/">Clear filters</a></p>
+      </div>
+    {% endfor %}
+
+    {% if result.pages > 1 %}
+      <nav class="pagination" aria-label="Result pages">
+        {% if result.page > 1 %}<a href="{{ page_url(result.page - 1) }}">‹ Previous</a>{% endif %}
+        {% for number in range(1, result.pages + 1) %}
+          {% if number == result.page %}<span class="current">{{ number }}</span>
+          {% else %}<a href="{{ page_url(number) }}">{{ number }}</a>{% endif %}
+        {% endfor %}
+        {% if result.page < result.pages %}<a href="{{ page_url(result.page + 1) }}">Next ›</a>{% endif %}
+      </nav>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

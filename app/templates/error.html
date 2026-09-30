@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }}{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <p class="error-page__code">{{ status_code }}</p>
+  <h1>{{ heading }}</h1>
+  <p class="muted">{{ message }}</p>
+  <a class="button" href="/">Browse all listings</a>
+</div>
+{% endblock %}
