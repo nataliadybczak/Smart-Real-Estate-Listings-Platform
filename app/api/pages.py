@@ -4,11 +4,12 @@ from typing import Annotated
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from app.core.db import DbSession
 from app.core.templates import templates
 from app.schemas.listing import ListingFilters, SortOption
+from app.services import ai_search
 from app.services import listings as listing_service
 
 router = APIRouter(include_in_schema=False)
@@ -40,10 +41,28 @@ def listing_page(
             "filters": filters,
             "result": result,
             "districts": listing_service.district_counts(db),
+            "understood": ai_search.describe_filters(filters) if filters.ask else [],
+            "ai_error": request.query_params.get("ai_error") == "1",
+            "relaxed": request.query_params.getlist("relaxed") if filters.ask else [],
             "sort_labels": SORT_LABELS,
             "page_url": lambda page: page_url(request, page),
         },
     )
+
+
+@router.get("/ask")
+def ask(db: DbSession, text: Annotated[str, Query(max_length=300)] = "") -> RedirectResponse:
+    """AI search: interpret the sentence, then show ordinary filtered results for it."""
+    text = text.strip()
+    if not text:
+        return RedirectResponse("/", status_code=303)
+    try:
+        filters, dropped = ai_search.interpret(db, text)
+    except ai_search.AISearchError:
+        # The LLM is optional: without it the user still gets the normal search page.
+        return RedirectResponse(f"/?{urlencode({'ask': text, 'ai_error': '1'})}", status_code=303)
+    params = ai_search.filters_to_query(filters) + [("relaxed", label) for label in dropped]
+    return RedirectResponse(f"/?{urlencode(params)}", status_code=303)
 
 
 @router.get("/listings/{listing_id}", response_class=HTMLResponse)

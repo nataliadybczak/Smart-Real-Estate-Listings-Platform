@@ -34,10 +34,13 @@ class ListingFilters(BaseModel):
     rooms: list[int] = Field(default_factory=list, description="4 means 4 or more")
     market: str | None = Field(None, pattern="^(primary|secondary)$")
     no_ground_floor: bool = False
+    price_per_m2_max: int | None = Field(None, ge=0)
+    good_condition: bool = Field(False, description="Ready to move in or renovated (AI)")
     features: list[Feature] = Field(default_factory=list, description="Extracted by AI")
     condition: Condition | None = Field(None, description="Extracted by AI")
     sort: SortOption = SortOption.NEWEST
     page: int = Field(1, ge=1)
+    ask: str | None = Field(None, max_length=300, description="Original question from the AI chat")
 
     @field_validator("*", mode="before")
     @classmethod
@@ -60,7 +63,7 @@ class ListingFilters(BaseModel):
         return any(
             getattr(self, name) != getattr(defaults, name)
             for name in type(self).model_fields
-            if name not in {"sort", "page"}
+            if name not in {"sort", "page", "ask"}
         )
 
 
@@ -93,6 +96,10 @@ class ListingOut(BaseModel):
     flags: list[str]
     condition: str | None
     furnished: str | None
+    balcony: str | None
+    elevator: str | None
+    parking: str | None
+    monthly_fee_pln: int | None
     ai_summary: str | None
     fetched_at: datetime
 

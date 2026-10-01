@@ -30,6 +30,11 @@
         </div>
       </fieldset>
 
+      <label class="field">
+        <span>Max price per m² (PLN)</span>
+        <input type="number" name="price_per_m2_max" min="0" step="500" placeholder="any" value="{{ filters.price_per_m2_max or '' }}">
+      </label>
+
       <fieldset class="field">
         <legend>Area (m²)</legend>
         <div class="range">
@@ -52,9 +57,9 @@
 
       <fieldset class="field">
         <legend>Market</legend>
-        <div class="pills">
+        <div class="pills pills--row">
           {% for value, text in [('', 'All'), ('primary', 'Primary'), ('secondary', 'Secondary')] %}
-            <label class="pill">
+            <label class="pill ">
               <input type="radio" name="market" value="{{ value }}" data-autosubmit {% if (filters.market or '') == value %}checked{% endif %}>
               <span>{{ text }}</span>
             </label>
@@ -85,6 +90,11 @@
       </label>
 
       <label class="checkbox">
+        <input type="checkbox" name="good_condition" value="true" data-autosubmit {% if filters.good_condition %}checked{% endif %}>
+        <span>Ready to move in or renovated <span class="ai-mark">AI</span></span>
+      </label>
+
+      <label class="checkbox">
         <input type="checkbox" name="no_ground_floor" value="true" data-autosubmit {% if filters.no_ground_floor %}checked{% endif %}>
         <span>No ground floor</span>
       </label>
@@ -98,6 +108,32 @@
   </aside>
 
   <section class="results">
+    <div class="ask">
+      <form class="ask__form" action="/ask" method="get" role="search">
+        <span class="ask__icon" aria-hidden="true">✨</span>
+        <input type="text" name="text" maxlength="300" required value="{{ filters.ask or '' }}"
+               placeholder="Describe your flat, e.g. “a nice, cheap flat, around 40 m², with a balcony”"
+               aria-label="Describe the flat you are looking for">
+        <button type="submit" class="button ask__button">Ask AI</button>
+      </form>
+      {% if filters.ask %}
+        <div class="ask__thread">
+          <p class="bubble bubble--user">{{ filters.ask }}</p>
+          {% if ai_error %}
+            <p class="bubble bubble--ai">Sorry, AI search is not available right now. Please use the filters on the left, which work as usual.</p>
+          {% elif understood or relaxed %}
+            <p class="bubble bubble--ai">
+              {% if relaxed %}Nothing matched exactly, so I dropped <strong>{{ relaxed|join(', ') }}</strong>. {% endif %}
+              {% if understood %}I searched for: <strong>{{ understood|join(' · ') }}</strong>. {% endif %}
+              Found {{ result.total|listings }}. You can adjust any of this with the filters on the left.
+            </p>
+          {% else %}
+            <p class="bubble bubble--ai">I couldn't find specific criteria in that, so here are all listings. Try mentioning size, rooms, budget or features.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
     <div class="results__header">
       <p class="results__count"><strong>{{ result.total|listings }}</strong>{% if filters.is_active() %} match your filters{% endif %}</p>
       <label class="sort">

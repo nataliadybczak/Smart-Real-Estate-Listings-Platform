@@ -74,6 +74,10 @@ def apply_filters(stmt: Select, filters: ListingFilters) -> Select:
         stmt = stmt.where(feature_conditions[feature])
     if filters.condition:
         stmt = stmt.where(Listing.condition == filters.condition)
+    if filters.good_condition:
+        stmt = stmt.where(Listing.condition.in_(["ready", "renovated"]))
+    if filters.price_per_m2_max is not None:
+        stmt = stmt.where(Listing.price_per_m2 <= filters.price_per_m2_max)
     return stmt
 
 
@@ -101,6 +105,12 @@ def get_listing(db: Session, listing_id: int) -> Listing | None:
 
 def get_by_source_id(db: Session, source_id: str) -> Listing | None:
     return db.scalar(select(Listing).where(Listing.source_id == source_id))
+
+
+def clean_price_per_m2_values(db: Session) -> list[int]:
+    """Price per m² of listings trusted for statistics: no quality flags, no duplicates."""
+    stmt = select(Listing.price_per_m2, Listing.flags).where(Listing.duplicate_of.is_(None))
+    return [price for price, flags in db.execute(stmt) if not flags]
 
 
 def district_counts(db: Session) -> list[tuple[str, int]]:
