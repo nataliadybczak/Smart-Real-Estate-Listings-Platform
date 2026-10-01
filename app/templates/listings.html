@@ -25,14 +25,14 @@
       <fieldset class="field">
         <legend>Price (PLN)</legend>
         <div class="range">
-          <input type="number" name="price_min" min="0" step="10000" placeholder="min" value="{{ filters.price_min or '' }}">
-          <input type="number" name="price_max" min="0" step="10000" placeholder="max" value="{{ filters.price_max or '' }}">
+          <input type="number" name="price_min" min="0" step="any" placeholder="min" value="{{ filters.price_min or '' }}">
+          <input type="number" name="price_max" min="0" step="any" placeholder="max" value="{{ filters.price_max or '' }}">
         </div>
       </fieldset>
 
       <label class="field">
         <span>Max price per m² (PLN)</span>
-        <input type="number" name="price_per_m2_max" min="0" step="500" placeholder="any" value="{{ filters.price_per_m2_max or '' }}">
+        <input type="number" name="price_per_m2_max" min="0" step="any" placeholder="any" value="{{ filters.price_per_m2_max or '' }}">
       </label>
 
       <fieldset class="field">
