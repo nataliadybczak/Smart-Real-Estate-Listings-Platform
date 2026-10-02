@@ -11,8 +11,10 @@ from app.services.ai_search import (
     cheap_threshold,
     describe_filters,
     filters_to_query,
+    household_rooms,
     intent_to_filters,
     parse_intent,
+    share_living_room,
 )
 
 DISTRICTS = ["Bronowice", "Nowa Huta", "Stare Miasto"]
@@ -104,3 +106,32 @@ def test_nothing_is_relaxed_when_there_are_results():
 
     filters = to_filters(nice=True)
     assert relax_until_results(filters, lambda f: 3) == (filters, [])
+
+
+def test_couple_working_from_home_needs_four_rooms():
+    intent = SearchIntent(bedrooms_needed=1, home_offices_needed=2)
+    assert household_rooms(intent).explain() == (
+        "1 bedroom + 2 home offices + a living room = 4 rooms"
+    )
+    assert to_filters(bedrooms_needed=1, home_offices_needed=2).rooms == [4]
+
+
+def test_two_flatmates_need_two_bedrooms_and_a_living_room():
+    filters = to_filters(bedrooms_needed=2)
+    assert filters.rooms == [3, 4]
+    assert describe_filters(filters) == ["3+ rooms"]
+
+
+def test_explicit_room_count_wins_over_household():
+    intent = SearchIntent(rooms=[2], bedrooms_needed=2)
+    assert household_rooms(intent) is None
+    assert to_filters(rooms=[2], bedrooms_needed=2).rooms == [2]
+
+
+def test_household_falls_back_to_one_room_fewer_when_nothing_matches():
+    household = household_rooms(SearchIntent(bedrooms_needed=1, home_offices_needed=2))
+    filters = to_filters(bedrooms_needed=1, home_offices_needed=2)
+    relaxed, dropped = share_living_room(filters, household, lambda f: 0)
+    assert relaxed.rooms == [3, 4]
+    assert "living room" in dropped
+    assert share_living_room(filters, household, lambda f: 2) == (filters, None)

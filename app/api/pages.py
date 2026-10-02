@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from app.core.db import DbSession
 from app.core.templates import templates
 from app.schemas.listing import ListingFilters, SortOption
-from app.services import ai_search
+from app.services import ai_search, compare
 from app.services import listings as listing_service
 
 router = APIRouter(include_in_schema=False)
@@ -44,6 +44,7 @@ def listing_page(
             "understood": ai_search.describe_filters(filters) if filters.ask else [],
             "ai_error": request.query_params.get("ai_error") == "1",
             "relaxed": request.query_params.getlist("relaxed") if filters.ask else [],
+            "reasoning": request.query_params.get("reasoning") if filters.ask else None,
             "sort_labels": SORT_LABELS,
             "page_url": lambda page: page_url(request, page),
         },
@@ -57,11 +58,14 @@ def ask(db: DbSession, text: Annotated[str, Query(max_length=300)] = "") -> Redi
     if not text:
         return RedirectResponse("/", status_code=303)
     try:
-        filters, dropped = ai_search.interpret(db, text)
+        result = ai_search.interpret(db, text)
     except ai_search.AISearchError:
         # The LLM is optional: without it the user still gets the normal search page.
         return RedirectResponse(f"/?{urlencode({'ask': text, 'ai_error': '1'})}", status_code=303)
-    params = ai_search.filters_to_query(filters) + [("relaxed", label) for label in dropped]
+    params = ai_search.filters_to_query(result.filters)
+    params += [("relaxed", label) for label in result.dropped]
+    if result.reasoning:
+        params.append(("reasoning", result.reasoning))
     return RedirectResponse(f"/?{urlencode(params)}", status_code=303)
 
 
@@ -73,6 +77,27 @@ def listing_detail_page(request: Request, db: DbSession, listing_id: int) -> HTM
     original = (
         listing_service.get_by_source_id(db, listing.duplicate_of) if listing.duplicate_of else None
     )
+    similar = compare.similar_listings(db, listing)
+    compare_url = f"/compare?{urlencode([('ids', x.id) for x in [listing, *similar]])}"
     return templates.TemplateResponse(
-        request, "listing_detail.html", {"listing": listing, "original": original}
+        request,
+        "listing_detail.html",
+        {"listing": listing, "original": original, "similar": similar, "compare_url": compare_url},
+    )
+
+
+@router.get("/compare", response_class=HTMLResponse)
+def compare_page(
+    request: Request,
+    db: DbSession,
+    ids: Annotated[list[int] | None, Query()] = None,
+) -> HTMLResponse:
+    """Side-by-side table of 2-4 listings; the ids are in the URL, so it can be shared."""
+    listings = compare.get_listings(db, ids or [])
+    if len(listings) < 2:
+        raise HTTPException(status_code=404, detail="Pick at least two listings to compare")
+    return templates.TemplateResponse(
+        request,
+        "compare.html",
+        {"listings": listings, "rows": compare.comparison_rows(listings)},
     )

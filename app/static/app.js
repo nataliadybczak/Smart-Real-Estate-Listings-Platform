@@ -57,3 +57,10 @@ function initCarousel(root) {
 document.querySelectorAll("[data-carousel]").forEach((root) => {
   if (root.querySelector(".carousel__track")) initCarousel(root);
 });
+
+// Compare page: hide rows where all listings have the same value.
+document.querySelectorAll("[data-only-differences]").forEach((toggle) => {
+  toggle.addEventListener("change", () => {
+    document.getElementById("compare").classList.toggle("only-differences", toggle.checked);
+  });
+});

@@ -169,6 +169,13 @@ block content %}
       <p class="contact-note">
         Listed by: <strong>{{ listing.seller_type|label }}</strong>
       </p>
+      {% endif %} {% if similar %}
+      <a class="button button--secondary" href="{{ compare_url }}"
+        >⇄ Compare with similar ({{ similar|length }})</a
+      >
+      <p class="contact-note">
+        Same number of rooms, price and area within ±20%.
+      </p>
       {% endif %}
     </div>
   </aside>

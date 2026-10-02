@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Compare listings{% endblock %}
+{% block content %}
+<a class="back link" href="javascript:history.back()">‹ Back</a>
+
+<div class="compare-head">
+  <div>
+    <h1 class="detail__title">Compare listings</h1>
+    <p class="muted small compare-legend"><span class="compare-best-key">Green</span> marks the best value in a row.</p>
+  </div>
+  <label class="checkbox compare-toggle">
+    <input type="checkbox" data-only-differences>
+    <span>Show only differences</span>
+  </label>
+</div>
+
+<div class="compare-wrap">
+  <table class="compare" id="compare">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        {% for listing in listings %}
+          <th scope="col">
+            <a class="compare__offer" href="/listings/{{ listing.id }}">
+              {% if listing.images %}
+                <img src="{{ listing.images[0].url }}" alt="" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">
+              {% endif %}
+              <span class="compare__title">{{ listing.title }}</span>
+            </a>
+            {% if loop.first %}<span class="badge badge--muted">you were viewing</span>{% endif %}
+          </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr class="{% if not row.differs %}is-same{% endif %}">
+          <th scope="row">{{ row.label }}{% if row.ai %} <span class="ai-mark">AI</span>{% endif %}</th>
+          {% for cell in row.cells %}
+            <td class="{% if row.best[loop.index0] %}is-best{% endif %}">{{ cell }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="contact-note">AI values are extracted from the sellers' descriptions and may contain mistakes; “–” means the listing does not say.</p>
+{% endblock %}

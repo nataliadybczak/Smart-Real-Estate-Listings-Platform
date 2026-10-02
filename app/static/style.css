@@ -773,3 +773,112 @@ select:focus {
 .params--ai + .contact-note {
   margin-bottom: 16px;
 }
+
+/* ---------- Compare listings ---------- */
+.button--secondary {
+  margin-top: 16px;
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.compare-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.compare-toggle {
+  margin: 12px 0 0;
+}
+.compare-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-top: 12px;
+}
+.compare {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+.compare th,
+.compare td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+.compare tbody th {
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.compare thead th {
+  min-width: 200px;
+  font-weight: 600;
+}
+.compare thead th:first-child,
+.compare tbody th {
+  min-width: 150px;
+  width: 170px;
+}
+.compare__offer {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  margin-bottom: 6px;
+}
+.compare__offer img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: #e9ecf1;
+}
+.compare__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.compare td.is-best {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.compare-best-key {
+  color: var(--accent);
+  font-weight: 600;
+}
+.compare.only-differences tr.is-same {
+  display: none;
+}
+.compare-legend {
+  margin: 0;
+}
+/* keep the attribute names visible while scrolling sideways on a phone */
+.compare tbody th,
+.compare thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+@media (max-width: 640px) {
+  .compare thead th {
+    min-width: 160px;
+  }
+  .compare thead th:first-child,
+  .compare tbody th {
+    min-width: 100px;
+    width: 100px;
+    white-space: normal;
+  }
+}
+.compare .badge {
+  white-space: nowrap;
+}

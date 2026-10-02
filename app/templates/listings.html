@@ -123,6 +123,7 @@
             <p class="bubble bubble--ai">Sorry, AI search is not available right now. Please use the filters on the left, which work as usual.</p>
           {% elif understood or relaxed %}
             <p class="bubble bubble--ai">
+              {% if reasoning %}For your household you need <strong>{{ reasoning }}</strong>. {% endif %}
               {% if relaxed %}Nothing matched exactly, so I dropped <strong>{{ relaxed|join(', ') }}</strong>. {% endif %}
               {% if understood %}I searched for: <strong>{{ understood|join(' · ') }}</strong>. {% endif %}
               Found {{ result.total|listings }}. You can adjust any of this with the filters on the left.
