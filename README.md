@@ -2,12 +2,14 @@
 
 A listings platform for flats in Kraków: ~150 real offers scraped from Sprzedajemy.pl, cleaned, deduplicated and stored in MySQL. You can search them in three ways: filters (including facts AI extracted from the descriptions), an AI chat that understands your situation, and a side-by-side comparison of similar offer
 
-Live demo: https://smart-listings.onrender.com
+**Live demo:** https://smart-listings.onrender.com
+
+**Reasoning document:** [reasoning_document.md](reasoning_document.md)
 
 ## What it does 
 
 ### Search and filters
-- Full-text search in titles and descriptions (listings are in Polish, e.g. `balkon`).
+- Full-text search in titles and descriptions (listings are in Polish).
 - Filters: district, price, price per m², area, rooms (1 / 2 / 3 / 4+), market, no ground floor.
 - **Filters from descriptions (AI):** balcony, elevator, parking, furnished and condition –
   facts that exist only in the seller's free text. Only an explicit “yes” matches; a listing that
